@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My To-Do List</title>
   <link rel="icon" type="image/png" href="paper_14203821.png">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -37,7 +38,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 60px 20px;
+      padding: 60px 10px;
       color: var(--text-color);
       transition: background 0.3s, color 0.3s;
     }
@@ -45,11 +46,12 @@
     .container {
       background: var(--card-bg);
       border-radius: 20px;
-      padding: 30px;
+      padding: 20px;
       box-shadow: var(--shadow);
       max-width: 500px;
       width: 100%;
       position: relative;
+      margin: 0 auto;
     }
 
     .toggle-dark {
@@ -148,6 +150,7 @@
     .task-buttons {
       display: flex;
       gap: 6px;
+      flex-shrink: 0;
     }
 
     .task-buttons button {
@@ -199,6 +202,33 @@
       background: var(--input-bg);
       color: var(--text-color);
       width: 100%;
+    }
+
+    @media (max-width: 500px) {
+      .input-section {
+        flex-direction: column;
+      }
+
+      .btn-add {
+        width: 100%;
+      }
+
+      input[type="text"] {
+        width: 100%;
+      }
+
+      .task-buttons {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .task-buttons button {
+        margin-top: 6px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
     }
   </style>
 </head>
