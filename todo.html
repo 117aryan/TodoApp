@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My To-Do List</title>
+   <link rel="icon" type="image/png" href="paper_14203821.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+    :root {
+      --bg-color: #eef1f5;
+      --container-bg: rgba(255, 255, 255, 0.75);
+      --text-color: #222;
+      --input-bg: #fff;
+      --task-bg: #f1f3f5;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark {
+      --bg-color: #121212;
+      --container-bg: rgba(36, 36, 36, 0.8);
+      --text-color: #e0e0e0;
+      --input-bg: #2d2d2d;
+      --task-bg: #333;
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+      transition: background 0.3s;
+    }
+
+    .container {
+      background: var(--container-bg);
+      backdrop-filter: blur(12px);
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px var(--shadow);
+      width: 100%;
+      max-width: 520px;
+      color: var(--text-color);
+      transition: background 0.3s, color 0.3s;
+      position: relative;
+    }
+
+    .toggle-dark {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: #444;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.3s;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 26px;
+    }
+
+    .input-section {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 15px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .btn-add {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-add:hover {
+      background-color: #3e8e41;
+    }
+
+    .status {
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: var(--task-bg);
+      margin-bottom: 12px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.2s;
+    }
+
+    li:hover {
+      transform: scale(1.01);
+    }
+
+    .done {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .task-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .task-buttons button {
+      font-size: 14px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-done {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-done:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-edit {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background-color: #e68900;
+    }
+
+    .btn-save {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-delete {
+      background-color: #dc3545;
+      color: white;
+      font-size: 14px;
+    }
+
+    .btn-delete:hover {
+      background-color: #c82333;
+    }
+
+    .edit-input {
+      font-size: 15px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="toggle-dark" onclick="toggleDarkMode()">🌙</button>
+    <h1>✅ My To-Do List</h1>
+
+    <div class="input-section">
+      <input type="text" id="taskInput" placeholder="Enter your task..." />
+      <button class="btn-add" onclick="addTask()">➕</button>
+    </div>
+
+    <div class="status" id="status">0 of 0 done</div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("myTasks")) || [];
+
+    function saveTasks() {
+      localStorage.setItem("myTasks", JSON.stringify(tasks));
+    }
+
+    function updateStatus() {
+      const doneCount = tasks.filter(t => t.done).length;
+      document.getElementById("status").innerText = `${doneCount} of ${tasks.length} done`;
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+
+      tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        if (task.editing) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = task.text;
+          input.className = "edit-input";
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              tasks[index].text = input.value.trim();
+              tasks[index].editing = false;
+              saveTasks();
+              renderTasks();
+            }
+          });
+          span.appendChild(input);
+          setTimeout(() => input.focus(), 0);
+        } else {
+          span.innerText = task.text;
+          if (task.done) span.classList.add("done");
+        }
+
+        const btnDone = document.createElement("button");
+        btnDone.innerText = task.done ? "↩" : "✔️";
+        btnDone.className = "btn-done";
+        btnDone.onclick = () => {
+          tasks[index].done = !tasks[index].done;
+          saveTasks();
+          renderTasks();
+          updateStatus();
+        };
+
+        const btnEdit = document.createElement("button");
+        btnEdit.innerText = task.editing ? "💾" : "✏️";
+        btnEdit.className = task.editing ? "btn-save" : "btn-edit";
+        btnEdit.onclick = () => {
+          if (task.editing) return;
+          tasks[index].editing = true;
+          renderTasks();
+        };
+
+        const btnDelete = document.createElement("button");
+        btnDelete.innerText = "❌";
+        btnDelete.className = "btn-delete";
+        btnDelete.onclick = () => {
+          tasks.splice(index, 1);
+          saveTasks();
+          renderTasks();
+          updateStatus();
+        };
+
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "task-buttons";
+        btnGroup.appendChild(btnDone);
+        btnGroup.appendChild(btnEdit);
+        btnGroup.appendChild(btnDelete);
+
+        li.appendChild(span);
+        li.appendChild(btnGroup);
+        list.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const text = input.value.trim();
+      if (text !== "") {
+        tasks.push({ text, done: false, editing: false });
+        input.value = "";
+        saveTasks();
+        renderTasks();
+        updateStatus();
+      }
+    }
+
+    document.getElementById("taskInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        addTask();
+      }
+    });
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("darkMode", isDark ? "true" : "false");
+    }
+
+    function applyDarkMode() {
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark");
+      }
+    }
+
+    applyDarkMode();
+    renderTasks();
+    updateStatus();
+  </script>
+</body>
+</html>
